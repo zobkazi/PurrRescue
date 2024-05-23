@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import SocialMediaLogin from "./SocialMediaLogin";
 
 const SignupForm: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -78,6 +79,7 @@ const SignupForm: React.FC = () => {
           {error && <p className="text-red-500 mt-4">{error}</p>}
           {success && <p className="text-green-500 mt-4">{success}</p>}
         </form>
+        <SocialMediaLogin />
       </div>
     </main>
   );
