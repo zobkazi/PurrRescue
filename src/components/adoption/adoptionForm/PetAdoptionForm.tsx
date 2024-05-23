@@ -1,50 +1,33 @@
 "use client";
 import React, { useState } from "react";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  PetAdoptionSchema,
-  PetSize,
-  PetColor,
-  PetBreed,
-  PetCategory,
-} from "@/schemas/PetAdoptionSchema"; // Adjust the import according to your schema file path
+import { useForm } from "react-hook-form";
 import { z } from "zod";
+import axios from "axios";
+import { PetAdoptionSchema } from "@/schemas/PetAdoptionSchema";
 
-type PetAdoptionFormValues = z.infer<typeof PetAdoptionSchema>;
-
-const PetAdoptionForm: React.FC = () => {
-  const {
-    register,
-    handleSubmit: handleFormSubmit,
-    formState: { errors },
-    reset,
-  } = useForm<PetAdoptionFormValues>({
-    resolver: zodResolver(PetAdoptionSchema),
-  });
+const PetAdoptionForm = () => {
+  type UserSchema = z.infer<typeof PetAdoptionSchema>;
 
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const onSubmit = async (data: PetAdoptionFormValues) => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<UserSchema>({
+    resolver: zodResolver(PetAdoptionSchema),
+  });
+
+  const onSubmit = async (data: UserSchema) => {
     try {
-      const response = await fetch("", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        console.error("Failed to submit the form. Please try again.");
-        throw new Error("Failed to submit the form. Please try again.");
+      const response = await axios.post("", data); // Replace "/api/user/register" with your actual endpoint
+      console.log(response.data);
+      if (response.status === 200) {
+        setSuccessMessage("User created successfully!");
+        setErrorMessage(null);
       }
-
-      setSuccessMessage("Pet adoption form submitted successfully!");
-      setErrorMessage(null);
-
-      reset(); // Clear form fields
     } catch (error) {
       console.error(error);
       setErrorMessage("An error occurred. Please try again.");
@@ -52,203 +35,82 @@ const PetAdoptionForm: React.FC = () => {
     }
   };
 
-  const handleKeyPress = (event: React.KeyboardEvent<HTMLFormElement>) => {
-    if (event.key === "Enter") {
-      handleFormSubmit(onSubmit)(event);
-    }
-  };
-
   return (
-    <div className="container mx-auto p-4 mt-12 bg-white flex flex-col items-center justify-center text-gray-700">
-      <h1 className="text-2xl font-bold mb-4">Pet Adoption Form</h1>
-      <form
-        className="w-full max-w-lg"
-        onSubmit={handleFormSubmit(onSubmit)}
-        onKeyPress={handleKeyPress}
-      >
-        {/* Form fields */}
+    <div className="max-w-md mx-auto p-6 bg-gray-100 rounded-lg shadow-md">
+      {successMessage && (
+        <div
+          className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative"
+          role="alert"
+        >
+          <span className="block sm:inline">{successMessage}</span>
+        </div>
+      )}
+      {errorMessage && (
+        <div
+          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+          role="alert"
+        >
+          <span className="block sm:inline">{errorMessage}</span>
+        </div>
+      )}
 
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="mb-4">
+          <label htmlFor="name" className="block text-gray-700 font-bold mb-2">
+            Age
+          </label>
+          <input
+            type="text"
+            id="name"
+            {...register("age")}
+            className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          />
+          {errors.age && (
+            <p className="text-red-500 text-xs mt-1">{errors.age.message}</p>
+          )}
+        </div>
         <div className="mb-4">
           <label
-            className="block text-gray-700 text-sm font-bold mb-2"
             htmlFor="description"
+            className="block text-gray-700 font-bold mb-2"
           >
             Description
           </label>
-          <textarea
+          <input
+            type="text"
             id="description"
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             {...register("description")}
+            className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           />
           {errors.description && (
-            <p className="text-red-500 text-xs italic">
+            <p className="text-red-500 text-xs mt-1">
               {errors.description.message}
             </p>
           )}
         </div>
-
-        <div className="mb-4">
+        <div className="mb-6">
           <label
-            className="block text-gray-700 text-sm font-bold mb-2"
-            htmlFor="status"
+            htmlFor="Status"
+            className="block text-gray-700 font-bold mb-2"
           >
             Status
           </label>
           <input
+            type="text"
             id="status"
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             {...register("status")}
+            className="appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
           />
           {errors.status && (
-            <p className="text-red-500 text-xs italic">
-              {errors.status.message}
-            </p>
+            <p className="text-red-500 text-xs mt-1">{errors.status.message}</p>
           )}
         </div>
-
-        <div className="mb-4">
-          <label
-            className="block text-gray-700 text-sm font-bold mb-2"
-            htmlFor="size"
-          >
-            Size
-          </label>
-          <select
-            id="size"
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            {...register("size")}
-          >
-            {Object.values(PetSize).map((size) => (
-              <option key={size} value={size}>
-                {size}
-              </option>
-            ))}
-          </select>
-          {errors.size && (
-            <p className="text-red-500 text-xs italic">{errors.size.message}</p>
-          )}
-        </div>
-
-        <div className="mb-4">
-          <label
-            className="block text-gray-700 text-sm font-bold mb-2"
-            htmlFor="color"
-          >
-            Color
-          </label>
-          <select
-            id="color"
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            {...register("color")}
-          >
-            {Object.values(PetColor).map((color) => (
-              <option key={color} value={color}>
-                {color}
-              </option>
-            ))}
-          </select>
-          {errors.color && (
-            <p className="text-red-500 text-xs italic">
-              {errors.color.message}
-            </p>
-          )}
-        </div>
-
-        <div className="mb-4">
-          <label
-            className="block text-gray-700 text-sm font-bold mb-2"
-            htmlFor="age"
-          >
-            Age
-          </label>
-          <input
-            id="age"
-            type="number"
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            {...register("age", {
-              valueAsNumber: true,
-              min: {
-                value: 0,
-                message: "Age must be greater than or equal to 0",
-              },
-              required: "Age is required",
-            })}
-            pattern="[0-9]*"
-          />
-          {errors.age && (
-            <p className="text-red-500 text-xs italic">{errors.age.message}</p>
-          )}
-
-          {errors.age && (
-            <p className="text-red-500 text-xs italic">{errors.age.message}</p>
-          )}
-        </div>
-
-        <div className="mb-4">
-          <label
-            className="block text-gray-700 text-sm font-bold mb-2"
-            htmlFor="breed"
-          >
-            Breed
-          </label>
-          <select
-            id="breed"
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            {...register("breed")}
-          >
-            {Object.values(PetBreed).map((breed) => (
-              <option key={breed} value={breed}>
-                {breed}
-              </option>
-            ))}
-          </select>
-          {errors.breed && (
-            <p className="text-red-500 text-xs italic">
-              {errors.breed.message}
-            </p>
-          )}
-        </div>
-
-        <div className="mb-4">
-          <label
-            className="block text-gray-700 text-sm font-bold mb-2"
-            htmlFor="category"
-          >
-            Category
-          </label>
-          <select
-            id="category"
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            {...register("category")}
-          >
-            {Object.values(PetCategory).map((category) => (
-              <option key={category} value={category}>
-                {category}
-              </option>
-            ))}
-          </select>
-          {errors.category && (
-            <p className="text-red-500 text-xs italic">
-              {errors.category.message}
-            </p>
-          )}
-        </div>
-
-        <div className="flex items-center justify-between">
-          <button
-            type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-          >
-            Submit
-          </button>
-        </div>
-
-        {successMessage && (
-          <p className="text-green-500 text-xs italic mt-4">{successMessage}</p>
-        )}
-        {errorMessage && (
-          <p className="text-red-500 text-xs italic mt-4">{errorMessage}</p>
-        )}
+        <button
+          type="submit"
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+        >
+          Submit
+        </button>
       </form>
     </div>
   );
