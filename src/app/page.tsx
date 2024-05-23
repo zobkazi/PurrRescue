@@ -1,10 +1,10 @@
-import CreateUserForm from "@/components/authUser/user/UserForm";
+import CreatePetForm from "@/components/adoption/createPet/CreatePetForm";
 import React from "react";
 
 const Home = () => {
   return (
     <div>
-      <CreateUserForm />
+      <CreatePetForm />
     </div>
   );
 };

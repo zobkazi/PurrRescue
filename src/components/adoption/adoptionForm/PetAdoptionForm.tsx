@@ -4,10 +4,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import axios from "axios";
-import { PetAdoptionSchema } from "@/schemas/PetAdoptionSchema";
+import { UserSchema } from "@/schemas/UserSchema";
 
-const PetAdoptionForm = () => {
-  type UserSchema = z.infer<typeof PetAdoptionSchema>;
+const UserForm = () => {
+  type UserSchema = z.infer<typeof UserSchema>;
 
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -17,13 +17,12 @@ const PetAdoptionForm = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<UserSchema>({
-    resolver: zodResolver(PetAdoptionSchema),
+    resolver: zodResolver(UserSchema),
   });
 
   const onSubmit = async (data: UserSchema) => {
     try {
       const response = await axios.post("", data); // Replace "/api/user/register" with your actual endpoint
-      console.log(response.data);
       if (response.status === 200) {
         setSuccessMessage("User created successfully!");
         setErrorMessage(null);
@@ -53,56 +52,52 @@ const PetAdoptionForm = () => {
           <span className="block sm:inline">{errorMessage}</span>
         </div>
       )}
-
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="mb-4">
           <label htmlFor="name" className="block text-gray-700 font-bold mb-2">
-            Age
+            Name
           </label>
           <input
             type="text"
             id="name"
-            {...register("age")}
+            {...register("name")}
             className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           />
-          {errors.age && (
-            <p className="text-red-500 text-xs mt-1">{errors.age.message}</p>
+          {errors.name && (
+            <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
           )}
         </div>
         <div className="mb-4">
-          <label
-            htmlFor="description"
-            className="block text-gray-700 font-bold mb-2"
-          >
-            Description
+          <label htmlFor="email" className="block text-gray-700 font-bold mb-2">
+            Email
           </label>
           <input
-            type="text"
-            id="description"
-            {...register("description")}
+            type="email"
+            id="email"
+            {...register("email")}
             className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           />
-          {errors.description && (
-            <p className="text-red-500 text-xs mt-1">
-              {errors.description.message}
-            </p>
+          {errors.email && (
+            <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
           )}
         </div>
         <div className="mb-6">
           <label
-            htmlFor="Status"
+            htmlFor="password"
             className="block text-gray-700 font-bold mb-2"
           >
-            Status
+            Password
           </label>
           <input
-            type="text"
-            id="status"
-            {...register("status")}
+            type="password"
+            id="password"
+            {...register("password")}
             className="appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
           />
-          {errors.status && (
-            <p className="text-red-500 text-xs mt-1">{errors.status.message}</p>
+          {errors.password && (
+            <p className="text-red-500 text-xs mt-1">
+              {errors.password.message}
+            </p>
           )}
         </div>
         <button
@@ -116,4 +111,4 @@ const PetAdoptionForm = () => {
   );
 };
 
-export default PetAdoptionForm;
+export default UserForm;
