@@ -1,9 +1,21 @@
-import React from 'react'
+import type { NextPage } from "next";
+import Head from "next/head";
+import SignupForm from "@/components/authUser/auth/SignupFrom";
 
-const SignUp = () => {
+const SignupPage: NextPage = () => {
   return (
-    <div>SignUp</div>
-  )
-}
+    <div>
+      <Head>
+        <title>Signup Page</title>
+        <meta
+          name="description"
+          content="Signup page with Next.js, TypeScript, and TailwindCSS"
+        />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <SignupForm />
+    </div>
+  );
+};
 
-export default SignUp
+export default SignupPage;
