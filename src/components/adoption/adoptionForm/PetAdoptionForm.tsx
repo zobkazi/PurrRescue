@@ -16,8 +16,9 @@ type PetAdoptionFormValues = z.infer<typeof PetAdoptionSchema>;
 const PetAdoptionForm: React.FC = () => {
   const {
     register,
-    handleSubmit,
+    handleSubmit: handleFormSubmit,
     formState: { errors },
+    reset,
   } = useForm<PetAdoptionFormValues>({
     resolver: zodResolver(PetAdoptionSchema),
   });
@@ -27,24 +28,23 @@ const PetAdoptionForm: React.FC = () => {
 
   const onSubmit = async (data: PetAdoptionFormValues) => {
     try {
-      const response = await fetch("/api/pet-adoption", {
+      const response = await fetch("", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
       });
-      console.log(response);
 
-      if (response.ok) {
-        console.log("Pet adoption form submitted successfully");
-        setSuccessMessage("Pet adoption form submitted successfully!");
-        setErrorMessage(null);
-      } else {
-        console.error("Failed to submit the form");
-        setErrorMessage("Failed to submit the form. Please try again.");
-        setSuccessMessage(null);
+      if (!response.ok) {
+        console.error("Failed to submit the form. Please try again.");
+        throw new Error("Failed to submit the form. Please try again.");
       }
+
+      setSuccessMessage("Pet adoption form submitted successfully!");
+      setErrorMessage(null);
+
+      reset(); // Clear form fields
     } catch (error) {
       console.error(error);
       setErrorMessage("An error occurred. Please try again.");
@@ -52,10 +52,22 @@ const PetAdoptionForm: React.FC = () => {
     }
   };
 
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLFormElement>) => {
+    if (event.key === "Enter") {
+      handleFormSubmit(onSubmit)(event);
+    }
+  };
+
   return (
     <div className="container mx-auto p-4 mt-12 bg-white flex flex-col items-center justify-center text-gray-700">
       <h1 className="text-2xl font-bold mb-4">Pet Adoption Form</h1>
-      <form className="w-full max-w-lg" onSubmit={handleSubmit(onSubmit)}>
+      <form
+        className="w-full max-w-lg"
+        onSubmit={handleFormSubmit(onSubmit)}
+        onKeyPress={handleKeyPress}
+      >
+        {/* Form fields */}
+
         <div className="mb-4">
           <label
             className="block text-gray-700 text-sm font-bold mb-2"
