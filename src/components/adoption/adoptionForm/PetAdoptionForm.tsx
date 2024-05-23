@@ -34,15 +34,19 @@ const PetAdoptionForm: React.FC = () => {
         },
         body: JSON.stringify(data),
       });
+      console.log(response);
 
       if (response.ok) {
+        console.log("Pet adoption form submitted successfully");
         setSuccessMessage("Pet adoption form submitted successfully!");
         setErrorMessage(null);
       } else {
+        console.error("Failed to submit the form");
         setErrorMessage("Failed to submit the form. Please try again.");
         setSuccessMessage(null);
       }
     } catch (error) {
+      console.error(error);
       setErrorMessage("An error occurred. Please try again.");
       setSuccessMessage(null);
     }
@@ -149,8 +153,20 @@ const PetAdoptionForm: React.FC = () => {
             id="age"
             type="number"
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            {...register("age")}
+            {...register("age", {
+              valueAsNumber: true,
+              min: {
+                value: 0,
+                message: "Age must be greater than or equal to 0",
+              },
+              required: "Age is required",
+            })}
+            pattern="[0-9]*"
           />
+          {errors.age && (
+            <p className="text-red-500 text-xs italic">{errors.age.message}</p>
+          )}
+
           {errors.age && (
             <p className="text-red-500 text-xs italic">{errors.age.message}</p>
           )}

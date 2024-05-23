@@ -39,7 +39,12 @@ export const PetAdoptionSchema = z.object({
   size: z.nativeEnum(PetSize),
   gender: z.nativeEnum(PetGender),
   color: z.nativeEnum(PetColor),
-  age: z.number().min(0),
+  age: z
+    .number()
+    .min(0)
+    .refine((value) => value !== undefined, {
+      message: "Age must be greater than or equal to 0",
+    }),
   breed: z.nativeEnum(PetBreed),
   category: z.nativeEnum(PetCategory),
 });
